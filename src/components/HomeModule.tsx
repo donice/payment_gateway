@@ -1,10 +1,14 @@
 "use client"
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const HomeModule = () => {
   const router = useRouter()
-  router.back()
+
+  useEffect(() => {
+    router.back()
+  }, [router])
+
   return (
     <div>HomeModule</div>
   )
