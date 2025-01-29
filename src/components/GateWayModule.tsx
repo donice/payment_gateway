@@ -5,9 +5,18 @@ import Header from "./Header";
 import axiosInstance from "@/lib/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 
+declare global {
+  interface Window {
+    MonnifySDK?: any;
+    RmPaymentEngine?: any;
+    webpayCheckout?: any;
+  }
+}
+
 const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
   const paymentRef = payment_ref;
   const [data, setData] = useState<any>(null);
+  const [selectedGateway, setSelectedGateway] = useState<any>(null);
 
   const mutateGetPaymentDetails = useMutation({
     mutationKey: ["getPaymentDetails", paymentRef],
@@ -32,6 +41,137 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
     mutateGetPaymentDetails.mutate();
   }, []);
 
+  const loadScript = (src: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve(); 
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+      document.body.appendChild(script);
+    });
+  };
+
+  const onSubmit = () => {
+    if (!selectedGateway) {
+      alert("Please select a payment gateway");
+      return;
+    }
+    const payFunction = gatewayFunctions[selectedGateway];
+    if (payFunction) {
+      payFunction();
+    } else {
+      console.error("Payment gateway does not exist");
+    }
+  };
+
+  const payWithRemita = async () => {
+    await loadScript("https://remitademo.net/payment/v1/remita-pay-inline.bundle.js");
+    console.log("Paying with Remita (implement SDK or API logic here)");
+    const paymentEngine = window.RmPaymentEngine.init({
+      key:'QzAwMDAyNzEyNTl8MTEwNjE4NjF8OWZjOWYwNmMyZDk3MDRhYWM3YThiOThlNTNjZTE3ZjYxOTY5NDdmZWE1YzU3NDc0ZjE2ZDZjNTg1YWYxNWY3NWM4ZjMzNzZhNjNhZWZlOWQwNmJhNTFkMjIxYTRiMjYzZDkzNGQ3NTUxNDIxYWNlOGY4ZWEyODY3ZjlhNGUwYTY=',
+      transactionId: Math.floor(Math.random()*1101233), 
+      customerId: '39832',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@mailinator.com',
+      amount: 15000,
+      narration: 'Essential Walking Shoes',
+      onSuccess: function (response:any) {
+          console.log('callback Successful Response', response);
+      },
+      onError: function (response:any) {
+          console.log('callback Error Response', response);
+      },
+      onClose: function () {
+          console.log("closed");
+      }
+  });
+   paymentEngine.showPaymentWidget();
+  };
+
+  const payWithMonnify = async() => {
+    await loadScript("https://sdk.monnify.com/plugin/monnify.js");
+    console.log("paying with monnify");
+    if (window.MonnifySDK) {
+      window.MonnifySDK.initialize({
+        amount: 100,
+        currency: "NGN",
+        reference: new String(new Date().getTime()),
+        customerFullName: data?.customerFullName || "Damilare Ogunnaike", 
+        customerEmail: data?.customerEmail || "ogunnaike.damilare@gmail.com", 
+        apiKey: "MK_PROD_FLX4P92EDF", 
+        contractCode: "626609763141", 
+        paymentDescription: "Lahray World",
+        metadata: {
+          name: "Damilare",
+          age: 45,
+        },
+        incomeSplitConfig: [
+          {
+            subAccountCode: "MFY_SUB_342113621921",
+            feePercentage: 50,
+            splitAmount: 1900,
+            feeBearer: true,
+          },
+          {
+            subAccountCode: "MFY_SUB_342113621922",
+            feePercentage: 50,
+            splitAmount: 2100,
+            feeBearer: true,
+          },
+        ],
+        onLoadStart: () => {
+          console.log("loading has started");
+        },
+        onLoadComplete: () => {
+          console.log("SDK is UP");
+        },
+        onComplete: function (response: any) {
+          console.log(response);
+         
+        },
+        onClose: function (data: any) {
+          console.log(data);
+        },
+      });
+    } else {
+      console.error("Monnify SDK not loaded");
+    }
+  };
+
+  const paywithInterswitch = async() => {
+    await loadScript("https://newwebpay.qa.interswitchng.com/inline-checkout.js")
+
+    const paymentCallback = (response:any) => {
+      console.log('Payment Response:', response);
+      alert(`Payment ${response.responseCode === '00' ? 'successful' : 'failed'}. Check the console for details.`);
+    }
+    let samplePaymentRequest = {
+      merchant_code: "MX19329",
+      pay_item_id: "Default_Payable_MX19329",
+      txn_ref: `txn_${Date.now()}`,
+      amount: Number(data.amount) * 100,
+      currency: 566, // ISO 4217 numeric code of the currency used
+      onComplete: paymentCallback,
+      site_redirect_url: "http://localhost:3000/complete",
+      mode: "TEST",
+    };
+
+    window.webpayCheckout(samplePaymentRequest);
+  }
+
+  const gatewayFunctions: { [key: string]: () => void } = {
+    Monnify: payWithMonnify,
+    Remita: payWithRemita,
+    Interswitch: paywithInterswitch
+  };
+
+
   return (
     <section className="flex flex-col items-center justify-center h-screen p-4 md:p-0">
       <div className="grid gap-4 border-2 border-gray-100 w-full max-w-2xl p-4 md:p-8 rounded-xl shadow-2xl">
@@ -49,9 +189,10 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
               <div
                 key={gateway.id}
                 className="w-full p-4 border rounded-xl group hover:bg-green-700 ease-linear transition duration-300"
+                onClick={() => setSelectedGateway(gateway.name)}
               >
                 <a
-                  href={gateway.url}
+                  // href={gateway.url}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-5 group-hover:text-white"
@@ -72,7 +213,7 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
           </div>
         </div>
 
-        <button className="w-full bg-green-500 text-white py-4 md:py-5 rounded-xl text-sm md:text-2xl font-semibold  transition duration-300 hover:bg-green-800 ease-linear">
+        <button onClick={onSubmit} className="w-full bg-green-500 text-white py-4 md:py-5 rounded-xl text-sm md:text-2xl font-semibold  transition duration-300 hover:bg-green-800 ease-linear">
           Make Payment
         </button>
       </div>

@@ -17,4 +17,11 @@ export const gatewayArr: {
     image:
       "https://remita.net/assets/minimal/images/remita_orange_new_logo.svg",
   },
+  {
+    id: 3,
+    name: "Interswitch",
+    url: "#",
+    image:
+      "https://remita.net/assets/minimal/images/remita_orange_new_logo.svg",
+  },
 ];
