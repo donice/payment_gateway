@@ -73,7 +73,7 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
     await loadScript("https://remitademo.net/payment/v1/remita-pay-inline.bundle.js");
     console.log("Paying with Remita (implement SDK or API logic here)");
     const paymentEngine = window.RmPaymentEngine.init({
-      key:'QzAwMDAyNzEyNTl8MTEwNjE4NjF8OWZjOWYwNmMyZDk3MDRhYWM3YThiOThlNTNjZTE3ZjYxOTY5NDdmZWE1YzU3NDc0ZjE2ZDZjNTg1YWYxNWY3NWM4ZjMzNzZhNjNhZWZlOWQwNmJhNTFkMjIxYTRiMjYzZDkzNGQ3NTUxNDIxYWNlOGY4ZWEyODY3ZjlhNGUwYTY=',
+      key:process.env.NEXT_PUBLIC_REMITA_KEY,
       transactionId: Math.floor(Math.random()*1101233), 
       customerId: '39832',
       firstName: 'John',
@@ -104,7 +104,7 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
         reference: new String(new Date().getTime()),
         customerFullName: data?.customerFullName || "Damilare Ogunnaike", 
         customerEmail: data?.customerEmail || "ogunnaike.damilare@gmail.com", 
-        apiKey: "MK_PROD_FLX4P92EDF", 
+        apiKey: process.env.NEXT_PUBLIC_MONNIFY_API_KEY, 
         contractCode: "626609763141", 
         paymentDescription: "Lahray World",
         metadata: {
@@ -152,10 +152,10 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
       alert(`Payment ${response.responseCode === '00' ? 'successful' : 'failed'}. Check the console for details.`);
     }
     let samplePaymentRequest = {
-      merchant_code: "MX19329",
+      merchant_code: process.env.NEXT_PUBLIC_INTERSWITCH_MERCHANT_CODE,
       pay_item_id: "Default_Payable_MX19329",
       txn_ref: `txn_${Date.now()}`,
-      amount: Number(data.amount) * 100,
+      amount: 100,
       currency: 566, // ISO 4217 numeric code of the currency used
       onComplete: paymentCallback,
       site_redirect_url: "http://localhost:3000/complete",
