@@ -102,43 +102,32 @@ const GateWayModule = ({ payment_ref }: { payment_ref: string }) => {
         amount: 100,
         currency: "NGN",
         reference: new String(new Date().getTime()),
-        customerFullName: data?.customerFullName || "Damilare Ogunnaike", 
-        customerEmail: data?.customerEmail || "ogunnaike.damilare@gmail.com", 
-        apiKey: process.env.NEXT_PUBLIC_MONNIFY_API_KEY, 
-        contractCode: "626609763141", 
+        customerFullName: "Shukuralillahi bakare",
+        customerEmail: "shuksbakare@gmail.com",
+        apiKey: "MK_TEST_RJ7QWQLJWT",
+        contractCode: "3590090140",
+        isTestMode: true,
         paymentDescription: "Lahray World",
         metadata: {
           name: "Damilare",
           age: 45,
         },
-        incomeSplitConfig: [
-          {
-            subAccountCode: "MFY_SUB_342113621921",
-            feePercentage: 50,
-            splitAmount: 1900,
-            feeBearer: true,
-          },
-          {
-            subAccountCode: "MFY_SUB_342113621922",
-            feePercentage: 50,
-            splitAmount: 2100,
-            feeBearer: true,
-          },
-        ],
+      
         onLoadStart: () => {
-          console.log("loading has started");
+          console.log("loading has started")
         },
         onLoadComplete: () => {
-          console.log("SDK is UP");
+          console.log("SDK is UP")
         },
-        onComplete: function (response: any) {
-          console.log(response);
-         
+        onComplete: function (response:any) {
+          //Implement what happens when the transaction is completed.
+          console.log(response)
         },
-        onClose: function (data: any) {
-          console.log(data);
+        onClose: function (data:any) {
+          //Implement what should happen when the modal is closed here
+          console.log(data)
         },
-      });
+      })
     } else {
       console.error("Monnify SDK not loaded");
     }

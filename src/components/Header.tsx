@@ -5,9 +5,11 @@ const Header = ({ data }: { data: any }) => {
     <header className="grid gap-4">
       {" "}
       <div className="w-full text-left flex items-center gap-8">
-        <div className="flex items-center gap-4 w-16 h-16 md:w-24 md:h-24 bg-slate-100 rounded-full relative">
-          <div className="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-        </div>
+        {/* <div className="flex items-center gap-4 w-16 h-16 md:w-24 md:h-24 bg-slate-100 rounded-full relative">
+          <div className="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white">
+            <img src="https://abiapay.com/images/landing/Logo.svg" alt="" />
+          </div>
+        </div> */}
         <div>
           <p className="text-gray-400 text-sm md:text-lg ">{data?.taxpayer_phone ?? ""}</p>
           <h2 className="text-xl md:text-3xl text-gray-800 font-bold">
@@ -20,7 +22,7 @@ const Header = ({ data }: { data: any }) => {
         <div className="text-sm md:text-xl grid text-gray-500 gap-2">
           <p className="flex justify-between text-left">
             Amount:{" "}
-            <span className="text-gray-900 font-semibold">{data?.amount}</span>
+            <span className="text-gray-900 font-semibold">₦{data?.amount}</span>
           </p>
           <p className="flex justify-between text-left">
             Payment Ref:{" "}

@@ -24,4 +24,11 @@ export const gatewayArr: {
     image:
       "https://interswitchgroup.com/assets/images/home/interswitch_logo.svg",
   },
+  // {
+  //   id: 4,
+  //   name: "Pay with Transfer",
+  //   url: "#",
+  //   image:
+  //     "https://interswitchgroup.com/assets/images/home/interswitch_logo.svg",
+  // },
 ];
