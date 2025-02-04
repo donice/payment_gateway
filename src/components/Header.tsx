@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = ({ data }: { data: any }) => {
   return (
-    <header className="grid gap-4">
+    <header className="grid gap-4 py-10">
       {" "}
       <div className="w-full text-left flex items-center gap-8">
         {/* <div className="flex items-center gap-4 w-16 h-16 md:w-24 md:h-24 bg-slate-100 rounded-full relative">

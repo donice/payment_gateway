@@ -12,13 +12,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <QueryClientProvider client={queryClient}>
       <div className="text-center">
         <header className="main-header">
-          <h1>Payment Gateway</h1>
         </header>
 
         <main className="main-content">{children}</main>
 
-        <footer className="main-footer">
-          <p>&copy; 2024 Payment Gateway. All rights reserved.</p>
+        <footer className="main-footer py-10">
+          <p>&copy; 2025 Payment Gateway. All rights reserved.</p>
         </footer>
       </div>
     </QueryClientProvider>
