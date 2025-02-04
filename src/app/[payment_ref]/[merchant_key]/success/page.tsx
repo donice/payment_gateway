@@ -6,11 +6,11 @@ import { useRouter, useParams } from "next/navigation";
 const SuccessPage = () => {
   const router = useRouter();
   const params = useParams();
-  const { paymentRef, merchant_key } = params;
+  const { payment_ref, merchant_key } = params;
   console.log("Params:", params);
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = `http://localhost:3001/receipt/${merchant_key}`;
+      window.location.href = `http://localhost:3001/receipt/${payment_ref}`;
       // router.push(`/http://localhost:3001/receipt/${merchantKey}`);
     }, 3000);
 

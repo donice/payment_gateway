@@ -62,6 +62,10 @@ const GateWayModule = ({
     setIsTransferModalOpen(false);
   };
 
+  const goBack = () => {
+    router.back();
+  };
+
   const verifyMerchantKey = useMutation({
     mutationKey: ["verifyMerchantKey", merchant_key],
     mutationFn: () =>
@@ -108,6 +112,7 @@ const GateWayModule = ({
         setData(res);
       }
       if (res.response_code == "02") {
+        setIsPaymentCompleted(true);
         setErrorMessage("Payment has already been made for this reference.");
       }
       if (res.response_code == "01") {
@@ -185,6 +190,7 @@ const GateWayModule = ({
     mutateUpdatePaymentStatus.mutate(statusPayload, {
       onSuccess: () => {
         setIsPaymentCompleted(true);
+        console.log("Payment status updated successfully");
       },
     });
   };
@@ -336,126 +342,83 @@ const GateWayModule = ({
   };
 
   return (
-    <section className="flex flex-col items-center justify-center h-screen p-4 md:p-0">
-      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
-
-      <div className="grid gap-4 border-2 border-gray-100 w-full max-w-2xl p-4 md:p-8 rounded-xl shadow-2xl">
-        {/* Display header only when payment is completed */}
-        {isPaymentCompleted && (
-          <>
-            {/* <Header data={data} /> */}
-            <h1>{merchantData?.merchant_name}</h1>
-            <div className="text-green-600 font-semibold mt-4">
-              Payment has already been successfully completed for this
-              reference.
-            </div>
-            <button>Go Back</button>
-          </>
-        )}
-
-        {!isPaymentCompleted && (
-          <>
-            <Header data={data} />
-            <h1>{merchantData?.merchant_name}</h1>
-
-            {merchantVerified ? (
-              <div className="grid gap-4">
-                <div>
-                  <p className="text-xs md:text-md uppercase font-semibold text-gray-400">
-                    Select Gateway
-                  </p>
-                </div>
-
-                <div className="grid gap-3">
-                  {gatewayArr.map((gateway) => (
-                    <div
-                      key={gateway.id}
-                      className={`w-full p-2 border hover:bg-green-700 rounded-xs group ease-linear transition duration-300 ${
-                        selectedGateway === gateway.name
-                          ? "bg-green-700 text-white"
-                          : "bg-white-700 text-black"
-                      }`}
-                      onClick={() => setSelectedGateway(gateway.name)}
-                    >
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-5 group-hover:text-white"
+    <section className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="w-full max-w-md bg-white p-4 shadow-lg">
+        <div className="flex flex-col">
+          <div className="w-full p-4 border-b border-gray-300">
+            {isPaymentCompleted ? (
+              <>
+                <h1 className="text-center text-green-600 font-semibold">
+                  Payment Completed
+                </h1>
+                <p className="text-center text-gray-600 mt-4">
+                  Payment has already been successfully completed for this
+                  reference.
+                </p>
+                <button
+                  onClick={goBack}
+                  className="w-full bg-green-500 text-white py-2 mt-6 hover:bg-green-700 transition"
+                >
+                  Go Back
+                </button>
+              </>
+            ) : (
+              <>
+                <h1 className="text-center font-bold text-gray-700 mb-4">
+                  {merchantData?.merchant_name}
+                </h1>
+                <Header data={data} />
+                <div className="">
+                  {/* <h1 className="text-gray-500 text-xs uppercase bg-white px-3 -mt-4 text-center mb-4">
+          Select a Payment Gateway
+        </h1> */}
+                  <div className="flex flex-col gap-3 mb-3">
+                    {gatewayArr.map((gateway) => (
+                      <div
+                        key={gateway.id}
+                        className={`group cursor-pointer flex items-center gap-4 p-3 border shadow-md hover:bg-green-50 transition duration-300 ${
+                          selectedGateway === gateway.name
+                            ? "border-green-500"
+                            : "border-gray-300"
+                        }`}
+                        onClick={() => setSelectedGateway(gateway.name)}
                       >
-                        <div className="bg-yellow-50 rounded-lg md:p-4">
-                          <img
-                            src={gateway.image}
-                            alt={gateway.name}
-                            className="h-3 w-3 md:h-8 md:w-8"
-                          />
-                        </div>
-                        <p className="text-xs md:text-lg font-semibold">
+                        <img
+                          src={gateway.image}
+                          alt={gateway.name}
+                          className="w-8 h-8"
+                        />
+                        <p className="text-sm font-semibold text-gray-500 group-hover:text-gray-900">
                           Pay with {gateway.name}
                         </p>
-                      </a>
+                      </div>
+                    ))}
+                  </div>
+                  {merchantVerified ? (
+                    <button
+                      onClick={onSubmit}
+                      disabled={!selectedGateway || isPaymentCompleted}
+                      className={`w-full bg-green-500 text-white py-3 text-sm font-semibold transition duration-300 ${
+                        !selectedGateway || isPaymentCompleted
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "hover:bg-green-700"
+                      }`}
+                    >
+                      {isPaymentCompleted
+                        ? "Payment Completed"
+                        : "Make Payment"}
+                    </button>
+                  ) : (
+                    <div className="text-center text-gray-500">
+                      Verifying your merchant key...
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className="text-gray-500">
-                Please wait, verifying your merchant key...
-              </div>
+              </>
             )}
-
-            {merchantVerified && (
-              <button
-                onClick={onSubmit}
-                disabled={isPaymentCompleted}
-                className={`w-full bg-green-500 text-white py-4 md:py-5 rounded-xl text-sm md:text-2xl font-semibold transition duration-300 ${
-                  isPaymentCompleted
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "hover:bg-green-800"
-                }`}
-              >
-                {isPaymentCompleted ? "Payment Completed" : "Make Payment"}
-              </button>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Transfer Payment Modal */}
-      {isTransferModalOpen && (
-        <Dialog
-          open={isTransferModalOpen}
-          onClose={closeModal}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-        >
-          <div className="bg-white w-11/12 md:w-1/3 p-6 rounded-xl">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">
-              Pay with Transfer
-            </h2>
-            <p className="text-sm text-gray-500 mb-6">
-              Please transfer the payment to the provided account details to
-              complete your order.
-            </p>
-            <div className="bg-gray-100 p-4 rounded-md mb-4">
-              <p className="font-semibold text-gray-600">
-                Account Name: Solutions Account
-              </p>
-              <p className="font-semibold text-gray-600">
-                Account Number: 12345678
-              </p>
-              <p className="font-semibold text-gray-600">
-                Bank Name: Solutions Bank
-              </p>
-            </div>
-
-            <button
-              className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
-              onClick={closeModal}
-            >
-              Confirm Transfer
-            </button>
           </div>
-        </Dialog>
-      )}
+        </div>
+      </div>
     </section>
   );
 };
